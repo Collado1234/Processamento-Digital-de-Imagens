@@ -1,0 +1,73 @@
+object Form1: TForm1
+  Left = 232
+  Height = 597
+  Top = 209
+  Width = 1717
+  Caption = 'Form1'
+  ClientHeight = 597
+  ClientWidth = 1717
+  DesignTimePPI = 120
+  Menu = MainMenu1
+  OnCreate = FormCreate
+  LCLVersion = '3.2.0.0'
+  object Image1: TImage
+    Left = 104
+    Height = 390
+    Top = 80
+    Width = 393
+    OnClick = Image1Click
+  end
+  object Image2: TImage
+    Left = 720
+    Height = 390
+    Top = 80
+    Width = 393
+    OnClick = Image1Click
+  end
+  object Button1: TButton
+    Left = 544
+    Height = 136
+    Top = 216
+    Width = 151
+    Caption = '<=='
+    TabOrder = 0
+    OnClick = Button1Click
+  end
+  object MainMenu1: TMainMenu
+    Left = 1728
+    Top = 48
+    object MenuItem1: TMenuItem
+      Caption = 'Arquivo'
+      OnClick = MenuItem1Click
+      object MenuItem2: TMenuItem
+        Caption = '&Abrir'
+      end
+      object MenuItem3: TMenuItem
+        Caption = '&Salvar'
+      end
+      object MenuItem4: TMenuItem
+        Caption = 'Sai&r'
+        OnClick = MenuItem4Click
+      end
+    end
+    object MenuItem5: TMenuItem
+      Caption = 'Operações'
+      object MenuItem6: TMenuItem
+        Caption = '&Converter para Cinza'
+        OnClick = MenuItem6Click
+      end
+      object MenuItem7: TMenuItem
+        Caption = '&Negativar Cinza'
+        OnClick = MenuItem7Click
+      end
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 1688
+    Top = 168
+  end
+  object SaveDialog1: TSaveDialog
+    Left = 1800
+    Top = 168
+  end
+end
