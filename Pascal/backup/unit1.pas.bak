@@ -67,7 +67,7 @@ begin
      for i:=0 to Image1.Width do
         Ime[i,j] := Ims[i,j];
 
-  Image1.Picture := Image2.Picture ;
+  Image1.Canvas.Pixels[i,j] := RGB(c,c,c);
 end;
 
 procedure TForm1.MenuItem1Click(Sender: TObject);
@@ -95,7 +95,7 @@ begin
        Image2.Canvas.Pixels[i,j] := RGB(c,c,c);
      end;
 end;
-//Converter para Cinza
+
 procedure TForm1.MenuItem7Click(Sender: TObject);
 begin
   for j := 0 to Image1.Height - 1 do

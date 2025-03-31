@@ -34,8 +34,8 @@ object Form1: TForm1
     OnClick = Button1Click
   end
   object MainMenu1: TMainMenu
-    Left = 1376
-    Top = 136
+    Left = 1728
+    Top = 48
     object MenuItem1: TMenuItem
       Caption = 'Arquivo'
       OnClick = MenuItem1Click
@@ -63,11 +63,11 @@ object Form1: TForm1
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 1376
-    Top = 208
+    Left = 1688
+    Top = 168
   end
   object SaveDialog1: TSaveDialog
-    Left = 1376
-    Top = 296
+    Left = 1800
+    Top = 168
   end
 end
