@@ -183,8 +183,8 @@ void negativarImagem(FILE *file, const char *nomeImagem, int fileSize){
 
             // Define o novo valor de todos os componentes (r, g, b)
             buffer[pixelIndex + 2] = 255 - r; //Inverso do canal R
-            buffer[pixelIndex + 1] = 255 - r; //Inverso do canal G
-            buffer[pixelIndex] = 255 - r; //Inverso do canal B
+            buffer[pixelIndex + 1] = 255 - g; //Inverso do canal G
+            buffer[pixelIndex] = 255 - b; //Inverso do canal B
 
         }
     }
