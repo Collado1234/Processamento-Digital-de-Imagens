@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Menus,
-  StdCtrls, Windows;
+  StdCtrls,Unit2,Windows;
 
 type
 
@@ -18,12 +18,17 @@ type
     Image2: TImage;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
+    MenuItem10: TMenuItem;
+    MenuItem11: TMenuItem;
+    MenuItem12: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
+    MenuItem8: TMenuItem;
+    MenuItem9: TMenuItem;
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
     procedure Button1Click(Sender: TObject);
@@ -31,8 +36,10 @@ type
     procedure Image1Click(Sender: TObject);
     procedure MenuItem1Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
+    procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
+    procedure MenuItem8Click(Sender: TObject);
   private
 
   public
@@ -81,6 +88,11 @@ begin
   Close();
 end;
 
+procedure TForm1.MenuItem5Click(Sender: TObject);
+begin
+
+end;
+
 procedure TForm1.MenuItem6Click(Sender: TObject);
 begin
   for j:=0 to Image1.Height do
@@ -104,6 +116,13 @@ begin
         ims[i, j] := 255 - ime[i, j]; // Inversão de cores
         Image2.Canvas.Pixels[i, j] := RGB(ims[i, j], ims[i, j], ims[i, j]);
       end;
+end;
+
+//Converter Cores
+procedure TForm1.MenuItem8Click(Sender: TObject);
+begin
+     Form2 := TForm2.Create(Self);
+     Form2.Show;
 end;
 
 end.

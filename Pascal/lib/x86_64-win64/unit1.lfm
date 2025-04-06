@@ -1,0 +1,89 @@
+object Form1: TForm1
+  Left = 232
+  Height = 478
+  Top = 209
+  Width = 1374
+  Caption = 'Form1'
+  ClientHeight = 478
+  ClientWidth = 1374
+  Menu = MainMenu1
+  OnCreate = FormCreate
+  LCLVersion = '3.8.0.0'
+  object Image1: TImage
+    Left = 83
+    Height = 312
+    Top = 64
+    Width = 314
+    OnClick = Image1Click
+  end
+  object Image2: TImage
+    Left = 576
+    Height = 312
+    Top = 64
+    Width = 314
+    OnClick = Image1Click
+  end
+  object Button1: TButton
+    Left = 435
+    Height = 109
+    Top = 173
+    Width = 121
+    Caption = '<=='
+    TabOrder = 0
+    OnClick = Button1Click
+  end
+  object MainMenu1: TMainMenu
+    Left = 1101
+    Top = 109
+    object MenuItem1: TMenuItem
+      Caption = 'Arquivo'
+      OnClick = MenuItem1Click
+      object MenuItem2: TMenuItem
+        Caption = '&Abrir'
+      end
+      object MenuItem3: TMenuItem
+        Caption = '&Salvar'
+      end
+      object MenuItem4: TMenuItem
+        Caption = 'Sai&r'
+        OnClick = MenuItem4Click
+      end
+    end
+    object MenuItem5: TMenuItem
+      Caption = 'Operações'
+      OnClick = MenuItem5Click
+      object MenuItem6: TMenuItem
+        Caption = '&Converter para Cinza'
+        OnClick = MenuItem6Click
+      end
+      object MenuItem7: TMenuItem
+        Caption = '&Negativar Cinza'
+        OnClick = MenuItem7Click
+      end
+      object MenuItem9: TMenuItem
+        Caption = 'MenuItem9'
+      end
+      object MenuItem10: TMenuItem
+        Caption = 'MenuItem10'
+      end
+      object MenuItem11: TMenuItem
+        Caption = 'MenuItem11'
+      end
+      object MenuItem12: TMenuItem
+        Caption = 'MenuItem12'
+      end
+    end
+    object MenuItem8: TMenuItem
+      Caption = 'Converter Cores'
+      OnClick = MenuItem8Click
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 1101
+    Top = 166
+  end
+  object SaveDialog1: TSaveDialog
+    Left = 1101
+    Top = 237
+  end
+end
