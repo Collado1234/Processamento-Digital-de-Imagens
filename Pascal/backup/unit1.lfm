@@ -4,8 +4,8 @@ object Form1: TForm1
   Top = 209
   Width = 1145
   Caption = 'Form1'
-  ClientHeight = 598
-  ClientWidth = 1145
+  ClientHeight = 0
+  ClientWidth = 0
   DesignTimePPI = 120
   Menu = MainMenu1
   OnCreate = FormCreate
@@ -106,6 +106,7 @@ object Form1: TForm1
       end
       object MenuItem4: TMenuItem
         Caption = 'Sair'
+        OnClick = MenuItem4Click
       end
     end
     object MenuItem5: TMenuItem
@@ -206,21 +207,27 @@ object Form1: TForm1
         OnClick = MenuItem25Click
         object MenuItem6: TMenuItem
           Caption = 'Azul'
+          OnClick = MenuItem6Click
         end
         object MenuItem36: TMenuItem
           Caption = 'Verde'
+          OnClick = MenuItem36Click
         end
         object MenuItem37: TMenuItem
           Caption = 'Vermelho'
+          OnClick = MenuItem37Click
         end
         object MenuItem38: TMenuItem
           Caption = 'Cinza/Azul'
+          OnClick = MenuItem38Click
         end
         object MenuItem39: TMenuItem
           Caption = 'Cinza/Verde'
+          OnClick = MenuItem39Click
         end
         object MenuItem40: TMenuItem
           Caption = 'Cinza/Vermelho'
+          OnClick = MenuItem40Click
         end
       end
       object MenuItem26: TMenuItem

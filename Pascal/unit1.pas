@@ -100,7 +100,12 @@ type
     procedure MenuItem33Click(Sender: TObject);
     procedure MenuItem34Click(Sender: TObject);
     procedure MenuItem35Click(Sender: TObject);
+    procedure MenuItem36Click(Sender: TObject);
+    procedure MenuItem37Click(Sender: TObject);
+    procedure MenuItem38Click(Sender: TObject);
+    procedure MenuItem39Click(Sender: TObject);
     procedure MenuItem3Click(Sender: TObject);
+    procedure MenuItem40Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
@@ -265,7 +270,17 @@ end;
   //Negativar Cinza
 procedure TForm1.MenuItem29Click(Sender: TObject);
 begin
-
+  for j := 0 to Image1.Height - 1 do
+    for i := 0 to Image1.Width - 1 do
+      begin
+        cor := Image1.Canvas.Pixels[i, j];
+        r := GetRValue(cor);
+        g := GetGValue(cor);
+        b := GetBValue(cor);
+        ime[i, j] := round(0.299 * r + 0.587 * g + 0.114 * b); // cinza
+        ims[i, j] := 255 - ime[i, j]; // inversão
+        Image2.Canvas.Pixels[i, j] := RGB(ims[i, j], ims[i, j], ims[i, j]);
+      end;
 end;
 
 //Abrir Imagem
@@ -277,7 +292,16 @@ end;
   //Negativar colorida
 procedure TForm1.MenuItem30Click(Sender: TObject);
 begin
+  for j := 0 to Image1.Height - 1 do
+    for i := 0 to Image1.Width - 1 do
+      begin
+        cor := Image1.Canvas.Pixels[i, j];
+        r := 255 - GetRValue(cor);   //Separando Canais de Cores RGB
+        g := 255 - GetGValue(cor);
+        b := 255 - GetBValue(cor);
 
+        Image2.Canvas.Pixels[i, j] := RGB(r, g, b);
+      end;
 end;
   //Sobel Completo
 procedure TForm1.MenuItem31Click(Sender: TObject);
@@ -306,12 +330,43 @@ procedure TForm1.MenuItem35Click(Sender: TObject);
 begin
 
 end;
+ //Separar Canal Verde
+procedure TForm1.MenuItem36Click(Sender: TObject);
+begin
+
+end;
+//Separar Canal Vermelho
+procedure TForm1.MenuItem37Click(Sender: TObject);
+begin
+
+end;
+// Separar Canal Cinza Azul
+procedure TForm1.MenuItem38Click(Sender: TObject);
+begin
+
+end;
+  //Separar Canal Cinza Verde
+procedure TForm1.MenuItem39Click(Sender: TObject);
+begin
+
+end;
 
 //Salvar Imagem
 procedure TForm1.MenuItem3Click(Sender: TObject);
 begin
+// Exibe a caixa de diálogo de salvar
+  if SaveDialog1.Execute then
+  begin
+    // Salva a imagem no caminho escolhido pelo usuário
+    Image1.Picture.SaveToFile(SaveDialog1.FileName);
+  end;
+end;
+  //Separar Canal Cinza/Vermelho
+procedure TForm1.MenuItem40Click(Sender: TObject);
+begin
 
 end;
+
 //Sair
 procedure TForm1.MenuItem4Click(Sender: TObject);
 begin
@@ -323,29 +378,15 @@ begin
 
 end;
 
+//Separar Canal Azul
 procedure TForm1.MenuItem6Click(Sender: TObject);
 begin
-  for j:=0 to Image1.Height do
-    for i:=0 to Image1.Width do
-     begin
-       cor:= Image1.Canvas.Pixels[i,j];
-       r := GetRValue(cor);
-       g := GetGValue(cor);
-       b := GetBValue(cor);
-       c := round(0.299*r + 0.587*g + 0.114*b);
 
-       Image2.Canvas.Pixels[i,j] := RGB(c,c,c);
-     end;
 end;
 //Bilinear - A FAZER
 procedure TForm1.MenuItem7Click(Sender: TObject);
 begin
-  for j := 0 to Image1.Height - 1 do
-    for i := 0 to Image1.Width - 1 do
-      begin
-        ims[i, j] := 255 - ime[i, j]; // Inversão de cores
-        Image2.Canvas.Pixels[i, j] := RGB(ims[i, j], ims[i, j], ims[i, j]);
-      end;
+
 end;
 
 //Converter Modelo Cores
