@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Menus,
-  StdCtrls, Windows;
+  StdCtrls, Buttons,Unit2,Windows;
 
 type
 
@@ -14,16 +14,51 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
+    Button2: TButton;
+    Edit1: TEdit;
+    Edit2: TEdit;
+    Edit3: TEdit;
     Image1: TImage;
     Image2: TImage;
+    Label1: TLabel;
+    Label2: TLabel;
+    LabelDefine: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem11: TMenuItem;
     MenuItem12: TMenuItem;
+    MenuItem13: TMenuItem;
+    MenuItem14: TMenuItem;
+    MenuItem15: TMenuItem;
+    MenuItem16: TMenuItem;
+    MenuItem17: TMenuItem;
+    MenuItem18: TMenuItem;
+    MenuItem19: TMenuItem;
     MenuItem2: TMenuItem;
+    MenuItem20: TMenuItem;
+    MenuItem21: TMenuItem;
+    MenuItem22: TMenuItem;
+    MenuItem23: TMenuItem;
+    MenuItem24: TMenuItem;
+    MenuItem25: TMenuItem;
+    MenuItem26: TMenuItem;
+    MenuItem27: TMenuItem;
+    MenuItem28: TMenuItem;
+    MenuItem29: TMenuItem;
     MenuItem3: TMenuItem;
+    MenuItem30: TMenuItem;
+    MenuItem31: TMenuItem;
+    MenuItem32: TMenuItem;
+    MenuItem33: TMenuItem;
+    MenuItem34: TMenuItem;
+    MenuItem35: TMenuItem;
+    MenuItem36: TMenuItem;
+    MenuItem37: TMenuItem;
+    MenuItem38: TMenuItem;
+    MenuItem39: TMenuItem;
     MenuItem4: TMenuItem;
+    MenuItem40: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
@@ -32,14 +67,51 @@ type
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Edit1Change(Sender: TObject);
+    procedure Edit2Change(Sender: TObject);
+    procedure Edit3Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Image1Click(Sender: TObject);
+    procedure Label2Click(Sender: TObject);
+    procedure MenuItem10Click(Sender: TObject);
+    procedure MenuItem11Click(Sender: TObject);
+    procedure MenuItem13Click(Sender: TObject);
+    procedure MenuItem14Click(Sender: TObject);
+    procedure MenuItem15Click(Sender: TObject);
+    procedure MenuItem16Click(Sender: TObject);
+    procedure MenuItem17Click(Sender: TObject);
+    procedure MenuItem18Click(Sender: TObject);
+    procedure MenuItem19Click(Sender: TObject);
     procedure MenuItem1Click(Sender: TObject);
+    procedure MenuItem20Click(Sender: TObject);
+    procedure MenuItem21Click(Sender: TObject);
+    procedure MenuItem22Click(Sender: TObject);
+    procedure MenuItem23Click(Sender: TObject);
+    procedure MenuItem24Click(Sender: TObject);
+    procedure MenuItem25Click(Sender: TObject);
+    procedure MenuItem27Click(Sender: TObject);
+    procedure MenuItem28Click(Sender: TObject);
+    procedure MenuItem29Click(Sender: TObject);
+    procedure MenuItem2Click(Sender: TObject);
+    procedure MenuItem30Click(Sender: TObject);
+    procedure MenuItem31Click(Sender: TObject);
+    procedure MenuItem32Click(Sender: TObject);
+    procedure MenuItem33Click(Sender: TObject);
+    procedure MenuItem34Click(Sender: TObject);
+    procedure MenuItem35Click(Sender: TObject);
+    procedure MenuItem36Click(Sender: TObject);
+    procedure MenuItem37Click(Sender: TObject);
+    procedure MenuItem38Click(Sender: TObject);
+    procedure MenuItem39Click(Sender: TObject);
+    procedure MenuItem3Click(Sender: TObject);
+    procedure MenuItem40Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
     procedure MenuItem8Click(Sender: TObject);
+    procedure MenuItem9Click(Sender: TObject);
   private
 
   public
@@ -63,6 +135,58 @@ begin
 
 end;
 
+procedure TForm1.Label2Click(Sender: TObject);
+begin
+
+end;
+
+//Compressão Escala Dinâmica
+procedure TForm1.MenuItem10Click(Sender: TObject);
+begin
+
+end;
+//Equalizar
+procedure TForm1.MenuItem11Click(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.MenuItem13Click(Sender: TObject);
+begin
+
+end;
+
+//binarização
+procedure TForm1.MenuItem14Click(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.MenuItem15Click(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.MenuItem16Click(Sender: TObject);
+begin
+
+end;
+  //Laplaciano
+procedure TForm1.MenuItem17Click(Sender: TObject);
+begin
+
+end;
+  //Limiarizar
+procedure TForm1.MenuItem18Click(Sender: TObject);
+begin
+
+end;
+//Suavizar Media Np(8)
+procedure TForm1.MenuItem19Click(Sender: TObject);
+begin
+
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
 
@@ -70,19 +194,171 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  for j:=0 to Image1.Height do
-     for i:=0 to Image1.Width do
-        Ime[i,j] := Ims[i,j];
+    Image1.Picture := Image2.Picture;
+end;
+  //Definir Botão
+procedure TForm1.Button2Click(Sender: TObject);
+begin
 
-  Image1.Picture := Image2.Picture ;
+end;
+  //Output Magnitude
+procedure TForm1.Edit1Change(Sender: TObject);
+begin
+
+end;
+  //Direção output
+procedure TForm1.Edit2Change(Sender: TObject);
+begin
+
 end;
 
+  //Input T
+procedure TForm1.Edit3Change(Sender: TObject);
+begin
+
+end;
+//Onclick Arquivo - Mudar
 procedure TForm1.MenuItem1Click(Sender: TObject);
 begin
     if(OpenDialog1.Execute)
      then Image1.Picture.LoadFromFile(OpenDialog1.FileName);
 end;
 
+//Suavizar mediana[3,3]
+procedure TForm1.MenuItem20Click(Sender: TObject);
+begin
+
+end;
+
+//Suavizar Media Np(4)
+procedure TForm1.MenuItem21Click(Sender: TObject);
+begin
+
+end;
+
+//Sal e Pimenta
+procedure TForm1.MenuItem22Click(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.MenuItem23Click(Sender: TObject);
+begin
+
+end;
+    //Magnitude
+procedure TForm1.MenuItem24Click(Sender: TObject);
+begin
+
+end;
+ //Separar Canal
+procedure TForm1.MenuItem25Click(Sender: TObject);
+begin
+
+end;
+
+   //Interpolar Vizinho Próximo
+procedure TForm1.MenuItem27Click(Sender: TObject);
+begin
+
+end;
+  //Interpolar Bicúbica
+procedure TForm1.MenuItem28Click(Sender: TObject);
+begin
+
+end;
+  //Negativar Cinza
+procedure TForm1.MenuItem29Click(Sender: TObject);
+begin
+  for j := 0 to Image1.Height - 1 do
+    for i := 0 to Image1.Width - 1 do
+      begin
+        cor := Image1.Canvas.Pixels[i, j];
+        r := GetRValue(cor);
+        g := GetGValue(cor);
+        b := GetBValue(cor);
+        ime[i, j] := round(0.299 * r + 0.587 * g + 0.114 * b); // cinza
+        ims[i, j] := 255 - ime[i, j]; // inversão
+        Image2.Canvas.Pixels[i, j] := RGB(ims[i, j], ims[i, j], ims[i, j]);
+      end;
+end;
+
+//Abrir Imagem
+procedure TForm1.MenuItem2Click(Sender: TObject);
+begin
+   if OpenDialog1.Execute then
+    Image1.Picture.LoadFromFile(OpenDialog1.FileName);
+end;
+  //Negativar colorida
+procedure TForm1.MenuItem30Click(Sender: TObject);
+begin
+
+end;
+  //Sobel Completo
+procedure TForm1.MenuItem31Click(Sender: TObject);
+begin
+
+end;
+  //Sobel Horizontal
+procedure TForm1.MenuItem32Click(Sender: TObject);
+begin
+
+end;
+  //Sobel Vertical
+procedure TForm1.MenuItem33Click(Sender: TObject);
+begin
+
+end;
+
+//Inverter imagem Horizontal
+procedure TForm1.MenuItem34Click(Sender: TObject);
+begin
+
+end;
+
+//Inverter imagem Vertical
+procedure TForm1.MenuItem35Click(Sender: TObject);
+begin
+
+end;
+ //Separar Canal Verde
+procedure TForm1.MenuItem36Click(Sender: TObject);
+begin
+
+end;
+//Separar Canal Vermelho
+procedure TForm1.MenuItem37Click(Sender: TObject);
+begin
+
+end;
+// Separar Canal Cinza Azul
+procedure TForm1.MenuItem38Click(Sender: TObject);
+begin
+
+end;
+  //Separar Canal Cinza Verde
+procedure TForm1.MenuItem39Click(Sender: TObject);
+begin
+
+end;
+
+//Salvar Imagem
+procedure TForm1.MenuItem3Click(Sender: TObject);
+begin
+// Exibe a caixa de diálogo de salvar
+  if SaveDialog1.Execute then
+  begin
+    // Salva a imagem no caminho escolhido pelo usuário
+    Image1.Picture.SaveToFile(SaveDialog1.FileName);
+  end;
+end;
+  //Separar Canal Cinza/Vermelho
+procedure TForm1.MenuItem40Click(Sender: TObject);
+begin
+
+end;
+
+//Sair
 procedure TForm1.MenuItem4Click(Sender: TObject);
 begin
   Close();
@@ -93,7 +369,26 @@ begin
 
 end;
 
+//Separar Canal Azul
 procedure TForm1.MenuItem6Click(Sender: TObject);
+begin
+
+end;
+//Bilinear - A FAZER
+procedure TForm1.MenuItem7Click(Sender: TObject);
+begin
+
+end;
+
+//Converter Modelo Cores
+procedure TForm1.MenuItem8Click(Sender: TObject);
+begin
+     Form2 := TForm2.Create(Self);          //Manda pra outro formulário
+     Form2.Show;
+end;
+
+//Converter para Cinza
+procedure TForm1.MenuItem9Click(Sender: TObject);
 begin
   for j:=0 to Image1.Height do
     for i:=0 to Image1.Width do
@@ -106,23 +401,6 @@ begin
 
        Image2.Canvas.Pixels[i,j] := RGB(c,c,c);
      end;
-end;
-//Converter para Cinza
-procedure TForm1.MenuItem7Click(Sender: TObject);
-begin
-  for j := 0 to Image1.Height - 1 do
-    for i := 0 to Image1.Width - 1 do
-      begin
-        ims[i, j] := 255 - ime[i, j]; // Inversão de cores
-        Image2.Canvas.Pixels[i, j] := RGB(ims[i, j], ims[i, j], ims[i, j]);
-      end;
-end;
-
-//Converter Cores
-procedure TForm1.MenuItem8Click(Sender: TObject);
-begin
-     Form2 := TForm2.Create(Self);
-     Form2.Show;
 end;
 
 end.
