@@ -9,6 +9,7 @@ Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Menus,
   StdCtrls, Windows, Unit2, Math,LCLType, LCLIntf;
 
 type
+  TDoubleMatrix = array of array of Double;
 
   { TForm1 }
 
@@ -106,6 +107,11 @@ type
     procedure MenuItem9Click(Sender: TObject);
     procedure StaticText1Click(Sender: TObject);
     procedure Image2MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure CalcularDCT(imagem: TImage; var dct: TDoubleMatrix);
+    procedure InversaDCT(const dct: TDoubleMatrix; destino: TImage);
+
+
+
 
   private
        magnitudeArray: array of array of Double;
@@ -1095,34 +1101,162 @@ begin
       end;
 end;
 
-//PassaBaixa Cuttoff
-procedure TForm1.MenuItem41Click(Sender: TObject);
-var u,v,cutoff:Integer;
-begin
 
+// DCT funcao apenas                                                                                             // DCT funcao apenas
+procedure TForm1.CalcularDCT(imagem: TImage; var dct: TDoubleMatrix);
+const
+  N = 128;
+var
+  i, j, k, l: Integer;
+  Ci, Cj, sum: Double;
+  f: array[0..N - 1, 0..N - 1] of Double;
+  pixelColor: TColor;
+  gray: Byte;
+  DCTMat: TDoubleMatrix;
+begin
+  if (imagem.Picture.Bitmap.Width <> N) or (imagem.Picture.Bitmap.Height <> N) then
+  begin
+    ShowMessage('A imagem deve ter tamanho 128x128!');
+    Exit;
+  end;
+
+  // Converte para escala de cinza
+  for j := 0 to N - 1 do
+    for i := 0 to N - 1 do
+    begin
+      pixelColor := imagem.Canvas.Pixels[i, j];
+      gray := Round(0.299 * Red(pixelColor) + 0.587 * Green(pixelColor) + 0.114 * Blue(pixelColor));
+      f[i, j] := gray;
+    end;
+
+  // Aplica a DCT
+  for i := 0 to N - 1 do
+    for j := 0 to N - 1 do
+    begin
+      if i = 0 then Ci := 1 / Sqrt(N) else Ci := Sqrt(2) / Sqrt(N);
+      if j = 0 then Cj := 1 / Sqrt(N) else Cj := Sqrt(2) / Sqrt(N);
+
+      sum := 0;
+      for k := 0 to N - 1 do
+        for l := 0 to N - 1 do
+          sum := sum + f[k, l] *
+            cos((2 * k + 1) * i * Pi / (2 * N)) *
+            cos((2 * l + 1) * j * Pi / (2 * N));
+
+      dct[i, j] := Ci * Cj * sum;
+    end;
+
+  // Atualiza variáveis globais de min e max, se você quiser usar isso em outro lugar
+  minDCT := dct[0, 0];
+  maxDCT := dct[0, 0];
+  for i := 0 to N - 1 do
+    for j := 0 to N - 1 do
+    begin
+      if dct[i, j] < minDCT then minDCT := dct[i, j];
+      if dct[i, j] > maxDCT then maxDCT := dct[i, j];
+    end;
 end;
 
-//
+//Inversa DCT Funcao Apenas
+procedure TForm1.InversaDCT(const dct: TDoubleMatrix; destino: TImage);
+const
+  N = 128;
+var
+  i, j, u, v: Integer;
+  Ci, Cj, sum: Double;
+  f: array[0..N - 1, 0..N - 1] of Double;
+  gray: Byte;
+begin
+  // Aplica a IDCT 2D
+  for i := 0 to N - 1 do
+    for j := 0 to N - 1 do
+    begin
+      sum := 0;
+      for u := 0 to N - 1 do
+        for v := 0 to N - 1 do
+        begin
+          if u = 0 then Ci := 1 / Sqrt(N) else Ci := Sqrt(2) / Sqrt(N);
+          if v = 0 then Cj := 1 / Sqrt(N) else Cj := Sqrt(2) / Sqrt(N);
+          sum := sum + Ci * Cj * dct[u, v] *
+            cos((2 * i + 1) * u * Pi / (2 * N)) *
+            cos((2 * j + 1) * v * Pi / (2 * N));
+        end;
+      f[i, j] := sum;
+    end;
+
+  // Prepara imagem de saída
+  destino.Picture.Bitmap.Width := N;
+  destino.Picture.Bitmap.Height := N;
+
+  for i := 0 to N - 1 do
+    for j := 0 to N - 1 do
+    begin
+      gray := Round(EnsureRange(f[i, j], 0, 255));
+      destino.Canvas.Pixels[i, j] := RGBToColor(gray, gray, gray);
+    end;
+end;
+
+
+
+
+////PassaBaixa Cuttoff
+//procedure TForm1.MenuItem41Click(Sender: TObject);
+//const
+//  N = 128;
 //var
 //  u, v, cutoff: Integer;
+//  DCTMat: TDoubleMatrix;
 //begin
-//  // Copia imagem da esquerda (original) → matriz DCT
-//  CalcularDCT(imagemEsquerda, DCTMat);
+//  // Calcula a DCT da imagem original
+//  CalcularDCT(Image1, DCTMat);
 //
-//  // Input da frequência de corte
+//  // Pede ao usuário a frequência de corte
 //  cutoff := StrToInt(InputBox('Filtro Passa-Baixa', 'Frequência de corte (ex: 50):', '50'));
 //
-//  // Aplica filtro passa-baixa
-//  for u := 0 to 127 do
-//    for v := 0 to 127 do
+//  // Aplica o filtro passa-baixa baseado em distância do canto superior esquerdo
+//  for u := 0 to N - 1 do
+//    for v := 0 to N - 1 do
+//    begin
 //      if (u > cutoff) or (v > cutoff) then
 //        DCTMat[u, v] := 0;
+//    end;
 //
-//  // Converte de volta para imagem no domínio espacial
-//  InversaDCT(DCTMat, imagemDireita);
-//  ImageDireita.Picture.Bitmap := imagemDireita;
-//
+//  // Reconstrói a imagem com a IDCT
+//  InversaDCT(DCTMat, Image2);
 //end;
+//
+
+//PassaBaixa Cuttoff
+procedure TForm1.MenuItem41Click(Sender: TObject);
+var
+  u,v,cutoff:Integer;
+  DCTMat: TDoubleMatrix;
+begin
+   SetLength(DCTMat, 128, 128);
+   if (Image1.Picture.Bitmap.Width <> 128) or (Image1.Picture.Bitmap.Height <> 128) then
+      begin
+        ShowMessage('A imagem deve ter tamanho 128x128!');
+        Exit;
+      end;
+   Image2.Picture.Bitmap.SetSize(128, 128);
+
+
+   //input
+   cutoff:= StrToInt(InputBox('Filtro Passa-Baixa', 'Frequência de corte (ex: 50):','50'));
+
+   CalcularDCT(Image1,DCTMat);
+
+
+
+   //aplicando o filtro
+   for u := 0 to 127 do
+       for v := 0 to 127 do
+           if(u > cutoff) or (v > cutoff) then
+                DCTMat[u,v] := 0;
+
+   InversaDCT(DCTMat, Image2);
+   //Image2.Picture.Bitmap := Image2;
+end;
 
 //PassaAlta Cuttoff
 procedure TForm1.MenuItem42Click(Sender: TObject);

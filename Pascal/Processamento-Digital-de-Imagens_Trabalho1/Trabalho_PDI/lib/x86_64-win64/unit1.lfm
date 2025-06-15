@@ -201,6 +201,14 @@ object Form1: TForm1
         Caption = 'Inversa DCT'
         OnClick = MenuItem29Click
       end
+      object MenuItem41: TMenuItem
+        Caption = 'PassaBaixa(Cuttoff)'
+        OnClick = MenuItem41Click
+      end
+      object MenuItem42: TMenuItem
+        Caption = 'PassaAlta(Cuttof)'
+        OnClick = MenuItem42Click
+      end
     end
   end
   object OpenDialog1: TOpenDialog
