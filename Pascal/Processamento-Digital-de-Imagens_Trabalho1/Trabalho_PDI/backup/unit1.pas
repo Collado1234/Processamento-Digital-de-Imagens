@@ -57,6 +57,8 @@ type
     MenuItem40: TMenuItem;
     MenuItem41: TMenuItem;
     MenuItem42: TMenuItem;
+    MenuItem43: TMenuItem;
+    MenuItem44: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
@@ -100,6 +102,8 @@ type
     procedure MenuItem40Click(Sender: TObject);
     procedure MenuItem41Click(Sender: TObject);
     procedure MenuItem42Click(Sender: TObject);
+    procedure MenuItem43Click(Sender: TObject);
+    procedure MenuItem44Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
@@ -1246,8 +1250,6 @@ begin
 
    CalcularDCT(Image1,DCTMat);
 
-
-
    //aplicando o filtro
    for u := 0 to 127 do
        for v := 0 to 127 do
@@ -1260,8 +1262,99 @@ end;
 
 //PassaAlta Cuttoff
 procedure TForm1.MenuItem42Click(Sender: TObject);
+var
+  u, v, cutoff: Integer;
+  DCTMat: TDoubleMatrix;
 begin
+    SetLength(DCTMat, 128, 128);
 
+    if (Image1.Picture.Bitmap.Width <> 128) or (Image1.Picture.Bitmap.Height <> 128) then
+    begin
+      ShowMessage('A imagem deve ter tamanho 128x128!');
+      Exit;
+    end;
+
+    Image2.Picture.Bitmap.SetSize(128, 128);
+
+    // Entrada do usuário
+    cutoff := StrToInt(InputBox('Filtro Passa-Alta', 'Frequência de corte (ex: 50):', '50'));
+
+    // Calcula a DCT da imagem original
+    CalcularDCT(Image1, DCTMat);
+
+    // Aplica filtro passa-alta: zera tudo que está DENTRO do corte
+    for u := 0 to 127 do
+      for v := 0 to 127 do
+        if (u <= cutoff) and (v <= cutoff) then
+          DCTMat[u, v] := 0;
+
+    // Reconstrói imagem
+    InversaDCT(DCTMat, Image2);
+end;
+
+
+//PassaBaixa Radial
+procedure TForm1.MenuItem43Click(Sender: TObject);
+var
+  u,v,cutoff:Integer;
+  DCTMat: TDoubleMatrix;
+begin
+   SetLength(DCTMat, 128, 128);
+   if (Image1.Picture.Bitmap.Width <> 128) or (Image1.Picture.Bitmap.Height <> 128) then
+      begin
+        ShowMessage('A imagem deve ter tamanho 128x128!');
+        Exit;
+      end;
+   Image2.Picture.Bitmap.SetSize(128, 128);
+
+
+   //input
+   cutoff:= StrToInt(InputBox('Filtro Passa-Baixa', 'Frequência de corte (ex: 50):','50'));
+
+   CalcularDCT(Image1,DCTMat);
+
+   //aplicando o filtro
+   for u := 0 to 127 do               //Filtro Radial
+    for v := 0 to 127 do
+      if sqrt(sqr(u) + sqr(v)) > cutoff then
+        DCTMat[u,v] := 0;
+
+
+   InversaDCT(DCTMat, Image2);
+   //Image2.Picture.Bitmap := Image2;
+end;
+
+//Passa Alta Radial
+procedure TForm1.MenuItem44Click(Sender: TObject);
+begin
+  var
+    u, v, cutoff: Integer;
+    DCTMat: TDoubleMatrix;
+  begin
+      SetLength(DCTMat, 128, 128);
+
+      if (Image1.Picture.Bitmap.Width <> 128) or (Image1.Picture.Bitmap.Height <> 128) then
+      begin
+        ShowMessage('A imagem deve ter tamanho 128x128!');
+        Exit;
+      end;
+
+      Image2.Picture.Bitmap.SetSize(128, 128);
+
+      // Entrada do usuário
+      cutoff := StrToInt(InputBox('Filtro Passa-Alta', 'Frequência de corte (ex: 50):', '50'));
+
+      // Calcula a DCT da imagem original
+      CalcularDCT(Image1, DCTMat);
+
+      // Aplica filtro passa-alta: zera tudo que está DENTRO do corte
+      for u := 0 to 127 do
+        for v := 0 to 127 do
+          if (u <= cutoff) and (v <= cutoff) then
+            DCTMat[u, v] := 0;
+
+      // Reconstrói imagem
+      InversaDCT(DCTMat, Image2);
 end;
 
   //Sair

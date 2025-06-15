@@ -202,12 +202,20 @@ object Form1: TForm1
         OnClick = MenuItem29Click
       end
       object MenuItem41: TMenuItem
-        Caption = 'PassaBaixa(Cuttoff)'
+        Caption = 'PassaBaixa(Retangular)'
         OnClick = MenuItem41Click
       end
+      object MenuItem43: TMenuItem
+        Caption = 'PassaBaixa(Radial)'
+        OnClick = MenuItem43Click
+      end
       object MenuItem42: TMenuItem
-        Caption = 'PassaAlta(Cuttof)'
+        Caption = 'PassaAlta(Retangular)'
         OnClick = MenuItem42Click
+      end
+      object MenuItem44: TMenuItem
+        Caption = 'PassaAlta(Radial)'
+        OnClick = MenuItem44Click
       end
     end
   end
