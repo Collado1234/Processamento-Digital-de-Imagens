@@ -1,11 +1,11 @@
 object Form1: TForm1
-  Left = 367
-  Height = 571
-  Top = 222
-  Width = 1086
+  Left = -9
+  Height = 966
+  Top = -9
+  Width = 1920
   Caption = 'Form1'
-  ClientHeight = 571
-  ClientWidth = 1086
+  ClientHeight = 966
+  ClientWidth = 1920
   Color = clInfoBk
   DesignTimePPI = 120
   Menu = MainMenu1
@@ -23,6 +23,7 @@ object Form1: TForm1
     Height = 390
     Top = 88
     Width = 392
+    OnClick = Image2Click
   end
   object Button1: TButton
     Left = 464
@@ -188,6 +189,34 @@ object Form1: TForm1
     object MenuItem6: TMenuItem
       Caption = 'Conversão de Modelo de cores'
       OnClick = MenuItem6Click
+    end
+    object MenuItem8: TMenuItem
+      Caption = 'Funções Segunda Entrega'
+      OnClick = MenuItem8Click
+      object MenuItem23: TMenuItem
+        Caption = 'DCT'
+        OnClick = MenuItem23Click
+      end
+      object MenuItem29: TMenuItem
+        Caption = 'Inversa DCT'
+        OnClick = MenuItem29Click
+      end
+      object MenuItem41: TMenuItem
+        Caption = 'PassaBaixa(Retangular)'
+        OnClick = MenuItem41Click
+      end
+      object MenuItem43: TMenuItem
+        Caption = 'PassaBaixa(Radial)'
+        OnClick = MenuItem43Click
+      end
+      object MenuItem42: TMenuItem
+        Caption = 'PassaAlta(Retangular)'
+        OnClick = MenuItem42Click
+      end
+      object MenuItem44: TMenuItem
+        Caption = 'PassaAlta(Radial)'
+        OnClick = MenuItem44Click
+      end
     end
   end
   object OpenDialog1: TOpenDialog
