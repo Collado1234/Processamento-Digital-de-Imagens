@@ -217,6 +217,18 @@ object Form1: TForm1
         Caption = 'PassaAlta(Radial)'
         OnClick = MenuItem44Click
       end
+      object MenuItem45: TMenuItem
+        Caption = 'Filtro Minimo'
+        OnClick = MenuItem45Click
+      end
+      object MenuItem46: TMenuItem
+        Caption = 'Filtro Maximo'
+        OnClick = MenuItem46Click
+      end
+      object MenuItem47: TMenuItem
+        Caption = 'Filtro Ponto Medio'
+        OnClick = MenuItem47Click
+      end
     end
   end
   object OpenDialog1: TOpenDialog

@@ -10,6 +10,7 @@ Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Menus,
 
 type
   TDoubleMatrix = array of array of Double;
+  TFiltroTipo = (ftMinimo, ftMaximo, ftPontoMedio);
 
   { TForm1 }
 
@@ -59,6 +60,9 @@ type
     MenuItem42: TMenuItem;
     MenuItem43: TMenuItem;
     MenuItem44: TMenuItem;
+    MenuItem45: TMenuItem;
+    MenuItem46: TMenuItem;
+    MenuItem47: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
@@ -104,6 +108,9 @@ type
     procedure MenuItem42Click(Sender: TObject);
     procedure MenuItem43Click(Sender: TObject);
     procedure MenuItem44Click(Sender: TObject);
+    procedure MenuItem45Click(Sender: TObject);
+    procedure MenuItem46Click(Sender: TObject);
+    procedure MenuItem47Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
@@ -113,6 +120,7 @@ type
     procedure Image2MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure CalcularDCT(imagem: TImage; var dct: TDoubleMatrix);
     procedure InversaDCT(const dct: TDoubleMatrix; destino: TImage);
+    //procedure AplicarFiltroEspacialAPI(BitmapIn: TBitmap; BitmapOut: TBitmap; TipoFiltro: TFiltroTipo);
 
 
 
@@ -128,6 +136,8 @@ type
 var
   Form1: TForm1;
   minDCT, maxDCT: Double;
+  ModoInserirRuido: Boolean = False;
+
 
 
 implementation
@@ -135,6 +145,179 @@ implementation
 {$R *.lfm}
 
 { TForm1 }
+
+//procedure TForm1.AplicarFiltroEspacialAPI(BitmapIn: TBitmap; BitmapOut: TBitmap; TipoFiltro: TFiltroTipo);
+//  var
+//  x, y, i, j, k, Cinza, NovoPixel: Integer;
+//  Cor: TColor;
+//  Vizinhos: array[0..8] of Byte;
+//  MinVal, MaxVal: Byte;
+//begin
+//  Image2.Width := Image1.Width;
+//  Image2.Height := Image1.Height;
+//
+//  for y := 1 to Image1.Height - 2 do
+//    for x := 1 to Image1.Width - 2 do
+//    begin
+//      // Coleta a vizinhança 3x3
+//      i := 0;
+//      for j := -1 to 1 do
+//        for k := -1 to 1 do
+//        begin
+//          Cor := Image1.Canvas.Pixels[x + k, y + j];
+//          Cinza := (GetRValue(Cor) + GetGValue(Cor) + GetBValue(Cor)) div 3;
+//          Vizinhos[i] := Cinza;
+//          Inc(i);
+//        end;
+//
+//      case TipoFiltro of
+//        ftMinimo:
+//          begin
+//            MinVal := Vizinhos[0];
+//            for i := 1 to 8 do
+//              if Vizinhos[i] < MinVal then
+//                MinVal := Vizinhos[i];
+//            NovoPixel := MinVal;
+//          end;
+//
+//        ftMaximo:
+//          begin
+//            MaxVal := Vizinhos[0];
+//            for i := 1 to 8 do
+//              if Vizinhos[i] > MaxVal then
+//                MaxVal := Vizinhos[i];
+//            NovoPixel := MaxVal;
+//          end;
+//
+//        ftPontoMedio:
+//          begin
+//            MinVal := Vizinhos[0];
+//            MaxVal := Vizinhos[0];
+//            for i := 1 to 8 do
+//            begin
+//              if Vizinhos[i] < MinVal then MinVal := Vizinhos[i];
+//              if Vizinhos[i] > MaxVal then MaxVal := Vizinhos[i];
+//            end;
+//            NovoPixel := (MinVal + MaxVal) div 2;
+//          end;
+//      end;
+//
+//      Image2.Canvas.Pixels[x, y] := RGB(NovoPixel, NovoPixel, NovoPixel);
+//    end;
+//end;
+//
+
+function GetGrayValue(Color: TColor): Byte;
+begin
+  Result := Round(0.299 * Red(Color) + 0.587 * Green(Color) + 0.114 * Blue(Color));
+end;
+
+
+//Filtro Minimo
+procedure TForm1.MenuItem45Click(Sender: TObject);
+var
+  i, j, m, n: Integer;
+  window: array[0..8] of Byte;
+  idx: Integer;
+  gray: Byte;
+begin
+  // Ajusta tamanho da imagem destino
+  Image2.Width := Image1.Width;
+  Image2.Height := Image1.Height;
+
+  for j := 1 to Image1.Height - 2 do
+    for i := 1 to Image1.Width - 2 do
+    begin
+      idx := 0;
+      for m := -1 to 1 do
+        for n := -1 to 1 do
+        begin
+          window[idx] := GetGrayValue(Image1.Canvas.Pixels[i + n, j + m]);
+          Inc(idx);
+        end;
+
+      // Encontrar o mínimo
+      gray := window[0];
+      for idx := 1 to 8 do
+        if window[idx] < gray then
+          gray := window[idx];
+
+      Image2.Canvas.Pixels[i, j] := RGBToColor(gray, gray, gray);
+    end;
+end;
+
+ //Maximo
+procedure TForm1.MenuItem46Click(Sender: TObject);
+var
+  bmp: Graphics.TBitmap;
+  max, pixel, i, j, x, y: integer;
+  cor: TColor;
+begin
+  bmp := Graphics.TBitmap.Create;
+  try
+    bmp.Assign(Image1.Picture.Bitmap);  // Carregar a imagem de forma segura
+
+    for i := 1 to bmp.Width - 2 do
+      for j := 1 to bmp.Height - 2 do
+      begin
+        max := 0;
+
+        for x := -1 to 1 do
+          for y := -1 to 1 do
+          begin
+            cor := bmp.Canvas.Pixels[i + x, j + y];
+            pixel := GetRValue(ColorToRGB(cor));  // Pegando o canal vermelho (R)
+
+            if pixel > max then
+              max := pixel;
+          end;
+
+        Image2.Canvas.Pixels[i, j] := RGB(max, max, max);
+      end;
+  finally
+    bmp.Free;
+  end;
+end;
+
+//PontoMedio
+procedure TForm1.MenuItem47Click(Sender: TObject);
+var
+  bmp: Graphics.TBitmap;
+  max, min, pixel, i, j, x, y: integer;
+  cor: TColor;
+begin
+  bmp := Graphics.TBitmap.Create;
+  try
+    bmp.Assign(Image1.Picture.Bitmap);  // Forçar o carregamento real da imagem
+
+    for i := 1 to bmp.Width - 2 do
+      for j := 1 to bmp.Height - 2 do
+      begin
+        min := 256;
+        max := -1;
+
+        for x := -1 to 1 do
+          for y := -1 to 1 do
+          begin
+            cor := bmp.Canvas.Pixels[i + x, j + y];
+            pixel := GetRValue(ColorToRGB(cor));  // Pega o canal R (como estamos tratando imagem em tons de cinza)
+
+            if pixel < min then
+              min := pixel;
+            if pixel > max then
+              max := pixel;
+          end;
+
+        pixel := round((max + min) / 2);  // Corrigido o cálculo da média
+
+        Image2.Canvas.Pixels[i, j] := RGB(pixel, pixel, pixel);
+      end;
+  finally
+    bmp.Free;
+  end;
+end;
+
+
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
@@ -747,8 +930,6 @@ begin
     end;
 end;
 
-
-
   //Limiarizar
 procedure TForm1.MenuItem25Click(Sender: TObject);
 var
@@ -1200,36 +1381,6 @@ begin
     end;
 end;
 
-
-
-
-////PassaBaixa Cuttoff
-//procedure TForm1.MenuItem41Click(Sender: TObject);
-//const
-//  N = 128;
-//var
-//  u, v, cutoff: Integer;
-//  DCTMat: TDoubleMatrix;
-//begin
-//  // Calcula a DCT da imagem original
-//  CalcularDCT(Image1, DCTMat);
-//
-//  // Pede ao usuário a frequência de corte
-//  cutoff := StrToInt(InputBox('Filtro Passa-Baixa', 'Frequência de corte (ex: 50):', '50'));
-//
-//  // Aplica o filtro passa-baixa baseado em distância do canto superior esquerdo
-//  for u := 0 to N - 1 do
-//    for v := 0 to N - 1 do
-//    begin
-//      if (u > cutoff) or (v > cutoff) then
-//        DCTMat[u, v] := 0;
-//    end;
-//
-//  // Reconstrói a imagem com a IDCT
-//  InversaDCT(DCTMat, Image2);
-//end;
-//
-
 //PassaBaixa Cuttoff
 procedure TForm1.MenuItem41Click(Sender: TObject);
 var
@@ -1326,35 +1477,34 @@ end;
 
 //Passa Alta Radial
 procedure TForm1.MenuItem44Click(Sender: TObject);
+var
+  u, v, cutoff: Integer;
+  DCTMat: TDoubleMatrix;
 begin
-  var
-    u, v, cutoff: Integer;
-    DCTMat: TDoubleMatrix;
-  begin
-      SetLength(DCTMat, 128, 128);
+    SetLength(DCTMat, 128, 128);
 
-      if (Image1.Picture.Bitmap.Width <> 128) or (Image1.Picture.Bitmap.Height <> 128) then
-      begin
-        ShowMessage('A imagem deve ter tamanho 128x128!');
-        Exit;
-      end;
+    if (Image1.Picture.Bitmap.Width <> 128) or (Image1.Picture.Bitmap.Height <> 128) then
+    begin
+      ShowMessage('A imagem deve ter tamanho 128x128!');
+      Exit;
+    end;
 
-      Image2.Picture.Bitmap.SetSize(128, 128);
+    Image2.Picture.Bitmap.SetSize(128, 128);
 
-      // Entrada do usuário
-      cutoff := StrToInt(InputBox('Filtro Passa-Alta', 'Frequência de corte (ex: 50):', '50'));
+    // Entrada do usuário
+    cutoff := StrToInt(InputBox('Filtro Passa-Alta', 'Frequência de corte (ex: 50):', '50'));
 
-      // Calcula a DCT da imagem original
-      CalcularDCT(Image1, DCTMat);
+    // Calcula a DCT da imagem original
+    CalcularDCT(Image1, DCTMat);
 
-      // Aplica filtro passa-alta: zera tudo que está DENTRO do corte
-      for u := 0 to 127 do
-        for v := 0 to 127 do
-          if (u <= cutoff) and (v <= cutoff) then
-            DCTMat[u, v] := 0;
+    // Aplica filtro passa-alta: zera tudo que está DENTRO do corte
+    for u := 0 to 127 do
+      for v := 0 to 127 do
+        if sqrt(sqr(u) + sqr(v)) <= cutoff then
+          DCTMat[u, v] := 0;
 
-      // Reconstrói imagem
-      InversaDCT(DCTMat, Image2);
+    // Reconstrói imagem
+    InversaDCT(DCTMat, Image2);
 end;
 
   //Sair
