@@ -70,6 +70,7 @@ type
     MenuItem51: TMenuItem;
     MenuItem52: TMenuItem;
     MenuItem53: TMenuItem;
+    MenuItem54: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     MenuItem8: TMenuItem;
@@ -123,6 +124,7 @@ type
     procedure MenuItem50Click(Sender: TObject);
     procedure MenuItem52Click(Sender: TObject);
     procedure MenuItem53Click(Sender: TObject);
+    procedure MenuItem54Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
     procedure MenuItem8Click(Sender: TObject);
@@ -1757,17 +1759,201 @@ end;
 
 //Otsu Binarização
 procedure TForm1.MenuItem52Click(Sender: TObject);
+var
+  histograma: array[0..255] of Integer;
+  probabilidade: array[0..255] of Double;
+  i, x, y: Integer;
+  mediaGlobal, varianciaTotal: Double;
+  pesoFundo, pesoFundoAcum, pesoFundoAnterior: Double;
+  mediaFundo, mediaFundoAcum: Double;
+  mediaFundoAnterior: Double;
+  pesoObjeto, mediaObjeto: Double;
+  varianciaEntreClasses, maxVarianciaEntre: Double;
+  limiarOtimo: Integer;
+  bmp: Graphics.TBitmap;
+  pixelCor: Integer;
 begin
+  // Cria bitmap e copia a imagem original para manipulação segura
+  bmp := Graphics.TBitmap.Create;
+  try
+    bmp.Assign(Image1.Picture.Bitmap);
 
+    // Inicializa histograma
+    FillChar(histograma, SizeOf(histograma), 0);
+
+    // Calcula histograma (considerando componente R para tons de cinza)
+    for y := 0 to bmp.Height - 1 do
+      for x := 0 to bmp.Width - 1 do
+      begin
+        pixelCor := GetRValue(bmp.Canvas.Pixels[x, y]);
+        Inc(histograma[pixelCor]);
+      end;
+
+    // Calcula probabilidade de cada nível de cinza
+    for i := 0 to 255 do
+      probabilidade[i] := histograma[i] / (bmp.Width * bmp.Height);
+
+    // Calcula média global do histograma
+    mediaGlobal := 0.0;
+    for i := 0 to 255 do
+      mediaGlobal := mediaGlobal + i * probabilidade[i];
+
+    // Calcula variância total (não obrigatória para o algoritmo, mas pode ser útil)
+    varianciaTotal := 0.0;
+    for i := 0 to 255 do
+      varianciaTotal := varianciaTotal + Sqr(i - mediaGlobal) * probabilidade[i];
+
+    maxVarianciaEntre := -1.0;
+    limiarOtimo := 0;
+    pesoFundoAcum := 0.0;
+    mediaFundoAcum := 0.0;
+
+    // Encontra o limiar que maximiza a variância entre classes
+    for i := 0 to 255 do
+    begin
+      pesoFundoAcum := pesoFundoAcum + probabilidade[i];
+      if pesoFundoAcum = 0 then Continue;
+
+      pesoObjeto := 1.0 - pesoFundoAcum;
+      if pesoObjeto = 0 then Break;
+
+      mediaFundoAcum := mediaFundoAcum + i * probabilidade[i];
+
+      mediaFundo := mediaFundoAcum / pesoFundoAcum;
+      mediaObjeto := (mediaGlobal - mediaFundoAcum) / pesoObjeto;
+
+      varianciaEntreClasses := pesoFundoAcum * pesoObjeto * Sqr(mediaFundo - mediaObjeto);
+
+      if varianciaEntreClasses > maxVarianciaEntre then
+      begin
+        maxVarianciaEntre := varianciaEntreClasses;
+        limiarOtimo := i;
+      end;
+    end;
+
+    // Aplica binarização usando limiar encontrado
+    Image2.Picture.Bitmap.SetSize(bmp.Width, bmp.Height);
+    for y := 0 to bmp.Height - 1 do
+      for x := 0 to bmp.Width - 1 do
+      begin
+        pixelCor := GetRValue(bmp.Canvas.Pixels[x, y]);
+        if pixelCor >= limiarOtimo then
+          Image2.Canvas.Pixels[x, y] := RGB(255, 255, 255)  // branco
+        else
+          Image2.Canvas.Pixels[x, y] := RGB(0, 0, 0);         // preto
+      end;
+
+  finally
+    bmp.Free;
+  end;
 end;
 
 //Otsu Limiarização
 procedure TForm1.MenuItem53Click(Sender: TObject);
+var
+  histograma: array[0..255] of Integer;
+  probabilidade: array[0..255] of Double;
+  x, y, i, limiar: Integer;
+  mediaGlobal, varianciaTotal: Double;
+  pesoFundo, pesoObjeto: Double;
+  somaMediaFundo: Double;
+  mediaFundo, mediaObjeto: Double;
+  varianciaEntreClasses, maiorVariancia: Double;
+  bmpEntrada, bmpSaida: Graphics.TBitmap;
+  corOriginal, nivelCinza: Integer;
+begin
+  // Inicializa os bitmaps
+  bmpEntrada := Graphics.TBitmap.Create;
+  bmpSaida := Graphics.TBitmap.Create;
+  try
+    bmpEntrada.Assign(Image1.Picture.Bitmap);
+    bmpSaida.SetSize(bmpEntrada.Width, bmpEntrada.Height);
+
+    // Etapa 1: Converter imagem para tons de cinza
+    for y := 0 to bmpEntrada.Height - 1 do
+      for x := 0 to bmpEntrada.Width - 1 do
+      begin
+        corOriginal := bmpEntrada.Canvas.Pixels[x, y];
+        nivelCinza := Round(0.299 * GetRValue(corOriginal) + 0.587 * GetGValue(corOriginal) + 0.114 * GetBValue(corOriginal));
+        bmpEntrada.Canvas.Pixels[x, y] := RGB(nivelCinza, nivelCinza, nivelCinza);
+      end;
+
+    // Etapa 2: Construir o histograma
+    FillChar(histograma, SizeOf(histograma), 0);
+    for y := 0 to bmpEntrada.Height - 1 do
+      for x := 0 to bmpEntrada.Width - 1 do
+      begin
+        nivelCinza := GetRValue(bmpEntrada.Canvas.Pixels[x, y]);
+        Inc(histograma[nivelCinza]);
+      end;
+
+    // Etapa 3: Calcular a probabilidade de cada tom
+    for i := 0 to 255 do
+      probabilidade[i] := histograma[i] / (bmpEntrada.Width * bmpEntrada.Height);
+
+    // Etapa 4: Calcular a média global dos tons
+    mediaGlobal := 0.0;
+    for i := 0 to 255 do
+      mediaGlobal := mediaGlobal + i * probabilidade[i];
+
+    // Etapa 5: Encontrar o limiar ótimo com Otsu
+    maiorVariancia := -1.0;
+    somaMediaFundo := 0.0;
+    pesoFundo := 0.0;
+
+    for i := 0 to 255 do
+    begin
+      pesoFundo := 0.0;
+      somaMediaFundo := 0.0;
+
+      // Calcula peso da classe fundo até o limiar i
+      for x := 0 to i do
+      begin
+        pesoFundo := pesoFundo + probabilidade[x];
+        somaMediaFundo := somaMediaFundo + x * probabilidade[x];
+      end;
+
+      if pesoFundo = 0 then Continue;
+
+      pesoObjeto := 1.0 - pesoFundo;
+      if pesoObjeto = 0 then Break;
+
+      mediaFundo := somaMediaFundo / pesoFundo;
+      mediaObjeto := (mediaGlobal - somaMediaFundo) / pesoObjeto;
+
+      varianciaEntreClasses := pesoFundo * pesoObjeto * Sqr(mediaFundo - mediaObjeto);
+
+      if varianciaEntreClasses > maiorVariancia then
+      begin
+        maiorVariancia := varianciaEntreClasses;
+        limiar := i;
+      end;
+    end;
+
+    // Etapa 6: Aplicar a limiarização (tons acima do limiar permanecem, os de baixo ficam pretos)
+    for y := 0 to bmpEntrada.Height - 1 do
+      for x := 0 to bmpEntrada.Width - 1 do
+      begin
+        nivelCinza := GetRValue(bmpEntrada.Canvas.Pixels[x, y]);
+        if nivelCinza >= limiar then
+          bmpSaida.Canvas.Pixels[x, y] := bmpEntrada.Canvas.Pixels[x, y]  // Mantém o tom original (já em cinza)
+        else
+          bmpSaida.Canvas.Pixels[x, y] := RGB(0, 0, 0);                  // Coloca preto
+      end;
+
+    // Exibe o resultado
+    Image2.Picture.Bitmap := bmpSaida;
+  finally
+    bmpEntrada.Free;
+    bmpSaida.Free;
+  end;
+end;
+
+//Zhang e Suen
+procedure TForm1.MenuItem54Click(Sender: TObject);
 begin
 
 end;
-
-
 
 //Novo formulário
 procedure TForm1.MenuItem6Click(Sender: TObject);

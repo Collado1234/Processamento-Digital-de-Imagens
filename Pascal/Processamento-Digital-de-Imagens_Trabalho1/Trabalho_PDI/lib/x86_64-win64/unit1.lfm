@@ -241,6 +241,21 @@ object Form1: TForm1
         Caption = 'Laplaciano E Laplaciano Gaussiano'
         OnClick = MenuItem50Click
       end
+      object MenuItem51: TMenuItem
+        Caption = 'Otsu'
+        object MenuItem52: TMenuItem
+          Caption = 'Binarização'
+          OnClick = MenuItem52Click
+        end
+        object MenuItem53: TMenuItem
+          Caption = 'Limiarização'
+          OnClick = MenuItem53Click
+        end
+      end
+      object MenuItem54: TMenuItem
+        Caption = 'Zhang e Suen'
+        OnClick = MenuItem54Click
+      end
     end
   end
   object OpenDialog1: TOpenDialog

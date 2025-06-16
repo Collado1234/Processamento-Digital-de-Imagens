@@ -252,6 +252,10 @@ object Form1: TForm1
           OnClick = MenuItem53Click
         end
       end
+      object MenuItem54: TMenuItem
+        Caption = 'Zhang e Suen'
+        OnClick = MenuItem54Click
+      end
     end
   end
   object OpenDialog1: TOpenDialog
