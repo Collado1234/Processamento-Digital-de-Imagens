@@ -70,6 +70,7 @@ type
     MenuItem51: TMenuItem;
     MenuItem52: TMenuItem;
     MenuItem53: TMenuItem;
+    MenuItem54: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     MenuItem8: TMenuItem;
@@ -123,6 +124,7 @@ type
     procedure MenuItem50Click(Sender: TObject);
     procedure MenuItem52Click(Sender: TObject);
     procedure MenuItem53Click(Sender: TObject);
+    procedure MenuItem54Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
     procedure MenuItem8Click(Sender: TObject);
@@ -1768,11 +1770,11 @@ var
   pesoObjeto, mediaObjeto: Double;
   varianciaEntreClasses, maxVarianciaEntre: Double;
   limiarOtimo: Integer;
-  bmp: TBitmap;
+  bmp: Graphics.TBitmap;
   pixelCor: Integer;
 begin
   // Cria bitmap e copia a imagem original para manipulação segura
-  bmp := TBitmap.Create;
+  bmp := Graphics.TBitmap.Create;
   try
     bmp.Assign(Image1.Picture.Bitmap);
 
@@ -1848,10 +1850,234 @@ end;
 
 //Otsu Limiarização
 procedure TForm1.MenuItem53Click(Sender: TObject);
+var
+  histograma: array[0..255] of Integer;
+  probabilidade: array[0..255] of Double;
+  x, y, i, limiar: Integer;
+  mediaGlobal, varianciaTotal: Double;
+  pesoFundo, pesoObjeto: Double;
+  somaMediaFundo: Double;
+  mediaFundo, mediaObjeto: Double;
+  varianciaEntreClasses, maiorVariancia: Double;
+  bmpEntrada, bmpSaida: Graphics.TBitmap;
+  corOriginal, nivelCinza: Integer;
 begin
+  // Inicializa os bitmaps
+  bmpEntrada := Graphics.TBitmap.Create;
+  bmpSaida := Graphics.TBitmap.Create;
+  try
+    bmpEntrada.Assign(Image1.Picture.Bitmap);
+    bmpSaida.SetSize(bmpEntrada.Width, bmpEntrada.Height);
 
+    // Etapa 1: Converter imagem para tons de cinza
+    for y := 0 to bmpEntrada.Height - 1 do
+      for x := 0 to bmpEntrada.Width - 1 do
+      begin
+        corOriginal := bmpEntrada.Canvas.Pixels[x, y];
+        nivelCinza := Round(0.299 * GetRValue(corOriginal) + 0.587 * GetGValue(corOriginal) + 0.114 * GetBValue(corOriginal));
+        bmpEntrada.Canvas.Pixels[x, y] := RGB(nivelCinza, nivelCinza, nivelCinza);
+      end;
+
+    // Etapa 2: Construir o histograma
+    FillChar(histograma, SizeOf(histograma), 0);
+    for y := 0 to bmpEntrada.Height - 1 do
+      for x := 0 to bmpEntrada.Width - 1 do
+      begin
+        nivelCinza := GetRValue(bmpEntrada.Canvas.Pixels[x, y]);
+        Inc(histograma[nivelCinza]);
+      end;
+
+    // Etapa 3: Calcular a probabilidade de cada tom
+    for i := 0 to 255 do
+      probabilidade[i] := histograma[i] / (bmpEntrada.Width * bmpEntrada.Height);
+
+    // Etapa 4: Calcular a média global dos tons
+    mediaGlobal := 0.0;
+    for i := 0 to 255 do
+      mediaGlobal := mediaGlobal + i * probabilidade[i];
+
+    // Etapa 5: Encontrar o limiar ótimo com Otsu
+    maiorVariancia := -1.0;
+    somaMediaFundo := 0.0;
+    pesoFundo := 0.0;
+
+    for i := 0 to 255 do
+    begin
+      pesoFundo := 0.0;
+      somaMediaFundo := 0.0;
+
+      // Calcula peso da classe fundo até o limiar i
+      for x := 0 to i do
+      begin
+        pesoFundo := pesoFundo + probabilidade[x];
+        somaMediaFundo := somaMediaFundo + x * probabilidade[x];
+      end;
+
+      if pesoFundo = 0 then Continue;
+
+      pesoObjeto := 1.0 - pesoFundo;
+      if pesoObjeto = 0 then Break;
+
+      mediaFundo := somaMediaFundo / pesoFundo;
+      mediaObjeto := (mediaGlobal - somaMediaFundo) / pesoObjeto;
+
+      varianciaEntreClasses := pesoFundo * pesoObjeto * Sqr(mediaFundo - mediaObjeto);
+
+      if varianciaEntreClasses > maiorVariancia then
+      begin
+        maiorVariancia := varianciaEntreClasses;
+        limiar := i;
+      end;
+    end;
+
+    // Etapa 6: Aplicar a limiarização (tons acima do limiar permanecem, os de baixo ficam pretos)
+    for y := 0 to bmpEntrada.Height - 1 do
+      for x := 0 to bmpEntrada.Width - 1 do
+      begin
+        nivelCinza := GetRValue(bmpEntrada.Canvas.Pixels[x, y]);
+        if nivelCinza >= limiar then
+          bmpSaida.Canvas.Pixels[x, y] := bmpEntrada.Canvas.Pixels[x, y]  // Mantém o tom original (já em cinza)
+        else
+          bmpSaida.Canvas.Pixels[x, y] := RGB(0, 0, 0);                  // Coloca preto
+      end;
+
+    // Exibe o resultado
+    Image2.Picture.Bitmap := bmpSaida;
+  finally
+    bmpEntrada.Free;
+    bmpSaida.Free;
+  end;
 end;
 
+//Zhang e Suen
+procedure TForm1.MenuItem54Click(Sender: TObject);
+var
+  x, y, N, S, p1, p2, p3, p4, p5, p6, p7, p8, p9: Integer;
+  Alteracao: Boolean;
+  matrizImagem, pixelsParaRemover: array[0..319, 0..239] of Integer;
+  produtoA, produtoB: Integer;
+  bmpEntrada: Graphics.TBitmap;
+begin
+  bmpEntrada := Graphics.TBitmap.Create;
+  try
+    bmpEntrada.Assign(Image1.Picture.Bitmap);
+
+    // Passo 1: Copiar pixels da imagem para a matriz (valores de 0 ou 255)
+    for y := 0 to 239 do
+      for x := 0 to 319 do
+        matrizImagem[x, y] := GetRValue(bmpEntrada.Canvas.Pixels[x, y]);
+
+    Alteracao := True;
+
+    // Passo 2: Loop de afinamento até não haver mais alterações
+    while Alteracao do
+    begin
+      Alteracao := False;
+
+      // Etapa 1 do algoritmo
+      FillChar(pixelsParaRemover, SizeOf(pixelsParaRemover), 0);
+      for y := 1 to 238 do
+        for x := 1 to 318 do
+        begin
+          p1 := matrizImagem[x, y];
+          if p1 <> 255 then Continue;
+
+          // Vizinhança 3x3
+          p2 := matrizImagem[x, y - 1];
+          p3 := matrizImagem[x + 1, y - 1];
+          p4 := matrizImagem[x + 1, y];
+          p5 := matrizImagem[x + 1, y + 1];
+          p6 := matrizImagem[x, y + 1];
+          p7 := matrizImagem[x - 1, y + 1];
+          p8 := matrizImagem[x - 1, y];
+          p9 := matrizImagem[x - 1, y - 1];
+
+          // Número de vizinhos brancos (N)
+          N := Ord(p2 = 255) + Ord(p3 = 255) + Ord(p4 = 255) + Ord(p5 = 255) +
+               Ord(p6 = 255) + Ord(p7 = 255) + Ord(p8 = 255) + Ord(p9 = 255);
+
+          // Número de transições de preto para branco (S)
+          S := 0;
+          if (p2 = 0) and (p3 = 255) then Inc(S);
+          if (p3 = 0) and (p4 = 255) then Inc(S);
+          if (p4 = 0) and (p5 = 255) then Inc(S);
+          if (p5 = 0) and (p6 = 255) then Inc(S);
+          if (p6 = 0) and (p7 = 255) then Inc(S);
+          if (p7 = 0) and (p8 = 255) then Inc(S);
+          if (p8 = 0) and (p9 = 255) then Inc(S);
+          if (p9 = 0) and (p2 = 255) then Inc(S);
+
+          produtoA := p2 * p4 * p6;
+          produtoB := p4 * p6 * p8;
+
+          if (N >= 2) and (N <= 6) and (S = 1) and (produtoA = 0) and (produtoB = 0) then
+          begin
+            pixelsParaRemover[x, y] := 1;
+            Alteracao := True;
+          end;
+        end;
+
+      for y := 1 to 238 do
+        for x := 1 to 318 do
+          if pixelsParaRemover[x, y] = 1 then
+            matrizImagem[x, y] := 0;
+
+      // Etapa 2 do algoritmo
+      FillChar(pixelsParaRemover, SizeOf(pixelsParaRemover), 0);
+      for y := 1 to 238 do
+        for x := 1 to 318 do
+        begin
+          p1 := matrizImagem[x, y];
+          if p1 <> 255 then Continue;
+
+          p2 := matrizImagem[x, y - 1];
+          p3 := matrizImagem[x + 1, y - 1];
+          p4 := matrizImagem[x + 1, y];
+          p5 := matrizImagem[x + 1, y + 1];
+          p6 := matrizImagem[x, y + 1];
+          p7 := matrizImagem[x - 1, y + 1];
+          p8 := matrizImagem[x - 1, y];
+          p9 := matrizImagem[x - 1, y - 1];
+
+          N := Ord(p2 = 255) + Ord(p3 = 255) + Ord(p4 = 255) + Ord(p5 = 255) +
+               Ord(p6 = 255) + Ord(p7 = 255) + Ord(p8 = 255) + Ord(p9 = 255);
+
+          S := 0;
+          if (p2 = 0) and (p3 = 255) then Inc(S);
+          if (p3 = 0) and (p4 = 255) then Inc(S);
+          if (p4 = 0) and (p5 = 255) then Inc(S);
+          if (p5 = 0) and (p6 = 255) then Inc(S);
+          if (p6 = 0) and (p7 = 255) then Inc(S);
+          if (p7 = 0) and (p8 = 255) then Inc(S);
+          if (p8 = 0) and (p9 = 255) then Inc(S);
+          if (p9 = 0) and (p2 = 255) then Inc(S);
+
+          produtoA := p2 * p4 * p8;
+          produtoB := p2 * p6 * p8;
+
+          if (N >= 2) and (N <= 6) and (S = 1) and (produtoA = 0) and (produtoB = 0) then
+          begin
+            pixelsParaRemover[x, y] := 1;
+            Alteracao := True;
+          end;
+        end;
+
+      for y := 1 to 238 do
+        for x := 1 to 318 do
+          if pixelsParaRemover[x, y] = 1 then
+            matrizImagem[x, y] := 0;
+
+    end;
+
+    // Passo 3: Exibir o resultado no Image2
+    for y := 0 to 239 do
+      for x := 0 to 319 do
+        Image2.Canvas.Pixels[x, y] := RGB(matrizImagem[x, y], matrizImagem[x, y], matrizImagem[x, y]);
+
+  finally
+    bmpEntrada.Free;
+  end;
+end;
 
 
 //Novo formulário
