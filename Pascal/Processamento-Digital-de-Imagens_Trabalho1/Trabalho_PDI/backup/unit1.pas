@@ -1951,9 +1951,134 @@ end;
 
 //Zhang e Suen
 procedure TForm1.MenuItem54Click(Sender: TObject);
+var
+  x, y, N, S, p1, p2, p3, p4, p5, p6, p7, p8, p9: Integer;
+  Alteracao: Boolean;
+  matrizImagem, pixelsParaRemover: array[0..319, 0..239] of Integer;
+  produtoA, produtoB: Integer;
+  bmpEntrada: Graphics.TBitmap;
 begin
+  bmpEntrada := Graphics.TBitmap.Create;
+  try
+    bmpEntrada.Assign(Image1.Picture.Bitmap);
 
+    // Passo 1: Copiar pixels da imagem para a matriz (valores de 0 ou 255)
+    for y := 0 to 239 do
+      for x := 0 to 319 do
+        matrizImagem[x, y] := GetRValue(bmpEntrada.Canvas.Pixels[x, y]);
+
+    Alteracao := True;
+
+    // Passo 2: Loop de afinamento até não haver mais alterações
+    while Alteracao do
+    begin
+      Alteracao := False;
+
+      // Etapa 1 do algoritmo
+      FillChar(pixelsParaRemover, SizeOf(pixelsParaRemover), 0);
+      for y := 1 to 238 do
+        for x := 1 to 318 do
+        begin
+          p1 := matrizImagem[x, y];
+          if p1 <> 255 then Continue;
+
+          // Vizinhança 3x3
+          p2 := matrizImagem[x, y - 1];
+          p3 := matrizImagem[x + 1, y - 1];
+          p4 := matrizImagem[x + 1, y];
+          p5 := matrizImagem[x + 1, y + 1];
+          p6 := matrizImagem[x, y + 1];
+          p7 := matrizImagem[x - 1, y + 1];
+          p8 := matrizImagem[x - 1, y];
+          p9 := matrizImagem[x - 1, y - 1];
+
+          // Número de vizinhos brancos (N)
+          N := Ord(p2 = 255) + Ord(p3 = 255) + Ord(p4 = 255) + Ord(p5 = 255) +
+               Ord(p6 = 255) + Ord(p7 = 255) + Ord(p8 = 255) + Ord(p9 = 255);
+
+          // Número de transições de preto para branco (S)
+          S := 0;
+          if (p2 = 0) and (p3 = 255) then Inc(S);
+          if (p3 = 0) and (p4 = 255) then Inc(S);
+          if (p4 = 0) and (p5 = 255) then Inc(S);
+          if (p5 = 0) and (p6 = 255) then Inc(S);
+          if (p6 = 0) and (p7 = 255) then Inc(S);
+          if (p7 = 0) and (p8 = 255) then Inc(S);
+          if (p8 = 0) and (p9 = 255) then Inc(S);
+          if (p9 = 0) and (p2 = 255) then Inc(S);
+
+          produtoA := p2 * p4 * p6;
+          produtoB := p4 * p6 * p8;
+
+          if (N >= 2) and (N <= 6) and (S = 1) and (produtoA = 0) and (produtoB = 0) then
+          begin
+            pixelsParaRemover[x, y] := 1;
+            Alteracao := True;
+          end;
+        end;
+
+      for y := 1 to 238 do
+        for x := 1 to 318 do
+          if pixelsParaRemover[x, y] = 1 then
+            matrizImagem[x, y] := 0;
+
+      // Etapa 2 do algoritmo
+      FillChar(pixelsParaRemover, SizeOf(pixelsParaRemover), 0);
+      for y := 1 to 238 do
+        for x := 1 to 318 do
+        begin
+          p1 := matrizImagem[x, y];
+          if p1 <> 255 then Continue;
+
+          p2 := matrizImagem[x, y - 1];
+          p3 := matrizImagem[x + 1, y - 1];
+          p4 := matrizImagem[x + 1, y];
+          p5 := matrizImagem[x + 1, y + 1];
+          p6 := matrizImagem[x, y + 1];
+          p7 := matrizImagem[x - 1, y + 1];
+          p8 := matrizImagem[x - 1, y];
+          p9 := matrizImagem[x - 1, y - 1];
+
+          N := Ord(p2 = 255) + Ord(p3 = 255) + Ord(p4 = 255) + Ord(p5 = 255) +
+               Ord(p6 = 255) + Ord(p7 = 255) + Ord(p8 = 255) + Ord(p9 = 255);
+
+          S := 0;
+          if (p2 = 0) and (p3 = 255) then Inc(S);
+          if (p3 = 0) and (p4 = 255) then Inc(S);
+          if (p4 = 0) and (p5 = 255) then Inc(S);
+          if (p5 = 0) and (p6 = 255) then Inc(S);
+          if (p6 = 0) and (p7 = 255) then Inc(S);
+          if (p7 = 0) and (p8 = 255) then Inc(S);
+          if (p8 = 0) and (p9 = 255) then Inc(S);
+          if (p9 = 0) and (p2 = 255) then Inc(S);
+
+          produtoA := p2 * p4 * p8;
+          produtoB := p2 * p6 * p8;
+
+          if (N >= 2) and (N <= 6) and (S = 1) and (produtoA = 0) and (produtoB = 0) then
+          begin
+            pixelsParaRemover[x, y] := 1;
+            Alteracao := True;
+          end;
+        end;
+
+      for y := 1 to 238 do
+        for x := 1 to 318 do
+          if pixelsParaRemover[x, y] = 1 then
+            matrizImagem[x, y] := 0;
+
+    end;
+
+    // Passo 3: Exibir o resultado no Image2
+    for y := 0 to 239 do
+      for x := 0 to 319 do
+        Image2.Canvas.Pixels[x, y] := RGB(matrizImagem[x, y], matrizImagem[x, y], matrizImagem[x, y]);
+
+  finally
+    bmpEntrada.Free;
+  end;
 end;
+
 
 //Novo formulário
 procedure TForm1.MenuItem6Click(Sender: TObject);

@@ -21,12 +21,12 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="1944"/>
-        <CursorPos X="51" Y="1953"/>
+        <TopLine Value="2079"/>
+        <CursorPos X="76" Y="2163"/>
         <FoldState Value=" T3mb0U2A2 pkOpE0-1 piYkE0D3[94jI0D]Rj6jT0r2]IgkJ0L5]9cjY0J0111[V4FkR08[V4djE0a3114]L1uS05]X PiIiE0 T6u2040K p0xD03 T1\J0E TM Hyc01L"/>
+        <ComponentState Value="1"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="unit2.pas"/>
@@ -36,7 +36,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="64" Y="289"/>
+        <TopLine Value="275"/>
+        <CursorPos X="83" Y="288"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -67,7 +68,7 @@
         <UsageCount Value="9"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
+    <JumpHistory HistoryIndex="27">
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="254" Column="5" TopLine="239"/>
@@ -102,10 +103,6 @@
       </Position>
       <Position>
         <Filename Value="unit1.pas"/>
-        <Caret Line="344" Column="51" TopLine="386"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
         <Caret Line="407" Column="89" TopLine="390"/>
       </Position>
       <Position>
@@ -123,10 +120,6 @@
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="448" Column="94" TopLine="435"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="462" Column="5" TopLine="485"/>
       </Position>
       <Position>
         <Filename Value="unit1.pas"/>
