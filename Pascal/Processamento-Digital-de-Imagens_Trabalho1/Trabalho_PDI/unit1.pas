@@ -63,6 +63,7 @@ type
     MenuItem45: TMenuItem;
     MenuItem46: TMenuItem;
     MenuItem47: TMenuItem;
+    MenuItem48: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
@@ -111,6 +112,7 @@ type
     procedure MenuItem45Click(Sender: TObject);
     procedure MenuItem46Click(Sender: TObject);
     procedure MenuItem47Click(Sender: TObject);
+    procedure MenuItem48Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
@@ -120,7 +122,8 @@ type
     procedure Image2MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure CalcularDCT(imagem: TImage; var dct: TDoubleMatrix);
     procedure InversaDCT(const dct: TDoubleMatrix; destino: TImage);
-    //procedure AplicarFiltroEspacialAPI(BitmapIn: TBitmap; BitmapOut: TBitmap; TipoFiltro: TFiltroTipo);
+    procedure HSLtoRGB(H, S, L: Integer; var R, G, B: Integer);
+    procedure RGBtoHSL(R, G, B: Integer; var H, S, L: Integer);
 
 
 
@@ -145,67 +148,89 @@ implementation
 {$R *.lfm}
 
 { TForm1 }
+// Converte valores HSL (Hue, Saturation, Lightness) para RGB
+procedure TForm1.HSLtoRGB(H, S, L: Integer; var R, G, B: Integer);
+var
+  Hue, Saturation, Lightness: Double;
+  Chroma, X, M: Double;
+  Hr, Rtemp, Gtemp, Btemp: Double;
+begin
+  // Normalização dos valores de entrada
+  Hue := H / 255.0 * 360.0;      // Converte H para o intervalo 0-360 graus
+  Saturation := S / 255.0;       // Saturação normalizada de 0 a 1
+  Lightness := L / 255.0;        // Luminosidade normalizada de 0 a 1
 
-//procedure TForm1.AplicarFiltroEspacialAPI(BitmapIn: TBitmap; BitmapOut: TBitmap; TipoFiltro: TFiltroTipo);
-//  var
-//  x, y, i, j, k, Cinza, NovoPixel: Integer;
-//  Cor: TColor;
-//  Vizinhos: array[0..8] of Byte;
-//  MinVal, MaxVal: Byte;
-//begin
-//  Image2.Width := Image1.Width;
-//  Image2.Height := Image1.Height;
-//
-//  for y := 1 to Image1.Height - 2 do
-//    for x := 1 to Image1.Width - 2 do
-//    begin
-//      // Coleta a vizinhança 3x3
-//      i := 0;
-//      for j := -1 to 1 do
-//        for k := -1 to 1 do
-//        begin
-//          Cor := Image1.Canvas.Pixels[x + k, y + j];
-//          Cinza := (GetRValue(Cor) + GetGValue(Cor) + GetBValue(Cor)) div 3;
-//          Vizinhos[i] := Cinza;
-//          Inc(i);
-//        end;
-//
-//      case TipoFiltro of
-//        ftMinimo:
-//          begin
-//            MinVal := Vizinhos[0];
-//            for i := 1 to 8 do
-//              if Vizinhos[i] < MinVal then
-//                MinVal := Vizinhos[i];
-//            NovoPixel := MinVal;
-//          end;
-//
-//        ftMaximo:
-//          begin
-//            MaxVal := Vizinhos[0];
-//            for i := 1 to 8 do
-//              if Vizinhos[i] > MaxVal then
-//                MaxVal := Vizinhos[i];
-//            NovoPixel := MaxVal;
-//          end;
-//
-//        ftPontoMedio:
-//          begin
-//            MinVal := Vizinhos[0];
-//            MaxVal := Vizinhos[0];
-//            for i := 1 to 8 do
-//            begin
-//              if Vizinhos[i] < MinVal then MinVal := Vizinhos[i];
-//              if Vizinhos[i] > MaxVal then MaxVal := Vizinhos[i];
-//            end;
-//            NovoPixel := (MinVal + MaxVal) div 2;
-//          end;
-//      end;
-//
-//      Image2.Canvas.Pixels[x, y] := RGB(NovoPixel, NovoPixel, NovoPixel);
-//    end;
-//end;
-//
+  // Cálculo da Chroma
+  Chroma := (1 - Abs(2 * Lightness - 1)) * Saturation;
+  Hr := Hue / 60.0;
+  X := Chroma * (1 - Abs(Frac(Hr) * 2 - 1));
+
+  // Inicialização das cores temporárias Rtemp, Gtemp e Btemp
+  case Trunc(Hr) of
+    0: begin Rtemp := Chroma; Gtemp := X;      Btemp := 0; end;
+    1: begin Rtemp := X;      Gtemp := Chroma; Btemp := 0; end;
+    2: begin Rtemp := 0;      Gtemp := Chroma; Btemp := X; end;
+    3: begin Rtemp := 0;      Gtemp := X;      Btemp := Chroma; end;
+    4: begin Rtemp := X;      Gtemp := 0;      Btemp := Chroma; end;
+    else begin Rtemp := Chroma; Gtemp := 0;    Btemp := X; end;
+  end;
+
+  // Ajuste de luminosidade
+  M := Lightness - (Chroma / 2);
+
+  // Conversão final para escala de 0 a 255
+  R := Round((Rtemp + M) * 255);
+  G := Round((Gtemp + M) * 255);
+  B := Round((Btemp + M) * 255);
+end;
+
+
+// Converte valores RGB para HSL (Hue, Saturation, Lightness)
+procedure TForm1.RGBtoHSL(R, G, B: Integer; var H, S, L: Integer);
+var
+  Rnorm, Gnorm, Bnorm: Double;
+  MaxVal, MinVal, Delta: Double;
+  Hue, Saturation, Lightness: Double;
+begin
+  // Normalização dos valores RGB para 0-1
+  Rnorm := R / 255.0;
+  Gnorm := G / 255.0;
+  Bnorm := B / 255.0;
+
+  // Identificação dos valores máximo e mínimo entre os canais
+  MaxVal := Max(Rnorm, Max(Gnorm, Bnorm));
+  MinVal := Min(Rnorm, Min(Gnorm, Bnorm));
+  Delta := MaxVal - MinVal;
+
+  // Cálculo da luminosidade
+  Lightness := (MaxVal + MinVal) / 2;
+
+  // Cálculo da saturação
+  if Delta = 0 then
+    Saturation := 0
+  else
+    Saturation := Delta / (1 - Abs(2 * Lightness - 1));
+
+  // Cálculo do matiz (Hue)
+  if Delta = 0 then
+    Hue := 0
+  else if MaxVal = Rnorm then
+    Hue := 60 * ((Gnorm - Bnorm) / Delta)
+  else if MaxVal = Gnorm then
+    Hue := 60 * (((Bnorm - Rnorm) / Delta) + 2)
+  else
+    Hue := 60 * (((Rnorm - Gnorm) / Delta) + 4);
+
+  // Ajuste para manter Hue positivo
+  if Hue < 0 then
+    Hue := Hue + 360;
+
+  // Conversão final para escala 0-255
+  H := Round(Hue / 360.0 * 255);
+  S := Round(Saturation * 255);
+  L := Round(Lightness * 255);
+end;
+
 
 function GetGrayValue(Color: TColor): Byte;
 begin
@@ -317,7 +342,70 @@ begin
   end;
 end;
 
+procedure TForm1.MenuItem48Click(Sender: TObject);
+var
+  bmp: Graphics.TBitmap;
+  i, j: Integer;
+  H, S, L, R, G, B: Integer;
+  hist, histAcu: array [0..255] of Integer;
+  novoValor: array [0..255] of Byte;
+  matrizH, matrizS, matrizL, matrizLModificada: array [0..511, 0..511] of Integer;
+  largura, altura: Integer;
+begin
+  bmp := Graphics.TBitmap.Create;
+  try
+    bmp.Assign(Image1.Picture.Bitmap);  // Garantia que a imagem está carregada corretamente
+    largura := bmp.Width;
+    altura := bmp.Height;
 
+    // ======== ETAPA 1 - Conversão RGB para HSL e construção da matriz L ========
+    for i := 0 to largura - 1 do
+      for j := 0 to altura - 1 do
+      begin
+        RGBtoHSL(
+          GetRValue(ColorToRGB(bmp.Canvas.Pixels[i, j])),
+          GetGValue(ColorToRGB(bmp.Canvas.Pixels[i, j])),
+          GetBValue(ColorToRGB(bmp.Canvas.Pixels[i, j])),
+          H, S, L
+        );
+
+        matrizH[i, j] := H;
+        matrizS[i, j] := S;
+        matrizL[i, j] := L;
+      end;
+
+    // ======== ETAPA 2 - Cálculo do Histograma e Histograma Acumulado ========
+    FillChar(hist, SizeOf(hist), 0);
+    FillChar(histAcu, SizeOf(histAcu), 0);
+    FillChar(novoValor, SizeOf(novoValor), 0);
+
+    for i := 0 to largura - 1 do
+      for j := 0 to altura - 1 do
+        Inc(hist[matrizL[i, j]]);
+
+    histAcu[0] := hist[0];
+    for i := 1 to 255 do
+      histAcu[i] := histAcu[i - 1] + hist[i];
+
+    // ======== ETAPA 3 - Mapeamento dos novos valores de L ========
+    for i := 0 to 255 do
+      novoValor[i] := Min(255, Round(255 * histAcu[i] / (largura * altura)));
+
+    for i := 0 to largura - 1 do
+      for j := 0 to altura - 1 do
+        matrizLModificada[i, j] := novoValor[matrizL[i, j]];
+
+    // ======== ETAPA 4 - Conversão de volta para RGB ========
+    for i := 0 to largura - 1 do
+      for j := 0 to altura - 1 do
+      begin
+        HSLtoRGB(matrizH[i, j], matrizS[i, j], matrizLModificada[i, j], R, G, B);
+        Image2.Canvas.Pixels[i, j] := RGB(R, G, B);
+      end;
+  finally
+    bmp.Free;
+  end;
+end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin

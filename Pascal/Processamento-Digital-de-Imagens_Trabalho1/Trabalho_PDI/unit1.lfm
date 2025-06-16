@@ -229,6 +229,10 @@ object Form1: TForm1
         Caption = 'Filtro Ponto Medio'
         OnClick = MenuItem47Click
       end
+      object MenuItem48: TMenuItem
+        Caption = 'Equalização usando L'
+        OnClick = MenuItem48Click
+      end
     end
   end
   object OpenDialog1: TOpenDialog
