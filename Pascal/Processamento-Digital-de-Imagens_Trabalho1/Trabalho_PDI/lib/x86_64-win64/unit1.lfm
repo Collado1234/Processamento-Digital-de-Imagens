@@ -1,11 +1,11 @@
 object Form1: TForm1
-  Left = -9
-  Height = 966
-  Top = -9
-  Width = 1920
+  Left = 1
+  Height = 946
+  Top = 1
+  Width = 1900
   Caption = 'Form1'
-  ClientHeight = 966
-  ClientWidth = 1920
+  ClientHeight = 946
+  ClientWidth = 1900
   Color = clInfoBk
   DesignTimePPI = 120
   Menu = MainMenu1
@@ -13,20 +13,20 @@ object Form1: TForm1
   LCLVersion = '3.2.0.0'
   object Image1: TImage
     Left = 32
-    Height = 390
+    Height = 416
     Top = 88
-    Width = 392
+    Width = 568
     OnClick = Image1Click
   end
   object Image2: TImage
-    Left = 664
-    Height = 390
+    Left = 824
+    Height = 416
     Top = 88
-    Width = 392
+    Width = 568
     OnClick = Image2Click
   end
   object Button1: TButton
-    Left = 464
+    Left = 624
     Height = 136
     Top = 208
     Width = 180
@@ -232,6 +232,14 @@ object Form1: TForm1
       object MenuItem48: TMenuItem
         Caption = 'Equalização usando L'
         OnClick = MenuItem48Click
+      end
+      object MenuItem49: TMenuItem
+        Caption = 'Pseudo_Cores'
+        OnClick = MenuItem49Click
+      end
+      object MenuItem50: TMenuItem
+        Caption = 'Laplaciano E Laplaciano Gaussiano'
+        OnClick = MenuItem50Click
       end
     end
   end
