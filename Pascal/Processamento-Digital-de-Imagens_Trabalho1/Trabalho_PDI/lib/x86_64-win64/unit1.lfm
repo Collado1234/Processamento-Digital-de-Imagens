@@ -210,8 +210,28 @@ object Form1: TForm1
         OnClick = MenuItem43Click
       end
       object MenuItem42: TMenuItem
-        Caption = 'PassaAlta(Cuttof)'
+        Caption = 'PassaAlta(Retangular)'
         OnClick = MenuItem42Click
+      end
+      object MenuItem44: TMenuItem
+        Caption = 'PassaAlta(Radial)'
+        OnClick = MenuItem44Click
+      end
+      object MenuItem45: TMenuItem
+        Caption = 'Filtro Minimo'
+        OnClick = MenuItem45Click
+      end
+      object MenuItem46: TMenuItem
+        Caption = 'Filtro Maximo'
+        OnClick = MenuItem46Click
+      end
+      object MenuItem47: TMenuItem
+        Caption = 'Filtro Ponto Medio'
+        OnClick = MenuItem47Click
+      end
+      object MenuItem48: TMenuItem
+        Caption = 'Equalização usando L'
+        OnClick = MenuItem48Click
       end
     end
   end
