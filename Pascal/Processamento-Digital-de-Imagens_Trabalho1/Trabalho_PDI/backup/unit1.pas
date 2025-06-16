@@ -64,7 +64,12 @@ type
     MenuItem46: TMenuItem;
     MenuItem47: TMenuItem;
     MenuItem48: TMenuItem;
+    MenuItem49: TMenuItem;
     MenuItem5: TMenuItem;
+    MenuItem50: TMenuItem;
+    MenuItem51: TMenuItem;
+    MenuItem52: TMenuItem;
+    MenuItem53: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     MenuItem8: TMenuItem;
@@ -113,7 +118,11 @@ type
     procedure MenuItem46Click(Sender: TObject);
     procedure MenuItem47Click(Sender: TObject);
     procedure MenuItem48Click(Sender: TObject);
+    procedure MenuItem49Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
+    procedure MenuItem50Click(Sender: TObject);
+    procedure MenuItem52Click(Sender: TObject);
+    procedure MenuItem53Click(Sender: TObject);
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
     procedure MenuItem8Click(Sender: TObject);
@@ -123,6 +132,7 @@ type
     procedure CalcularDCT(imagem: TImage; var dct: TDoubleMatrix);
     procedure InversaDCT(const dct: TDoubleMatrix; destino: TImage);
     procedure HSLtoRGB(H, S, L: Integer; var R, G, B: Integer);
+    procedure RGBtoHSL(R, G, B: Integer; var H, S, L: Integer);
 
 
 
@@ -404,6 +414,58 @@ begin
   finally
     bmp.Free;
   end;
+end;
+(* Aplicação de Pseudo Cores - Mapeamento de Tons de Cinza para Cores *)
+procedure TForm1.MenuItem49Click(Sender: TObject);
+var
+  i, j, tomCinza: Integer;
+  tabelaPseudoCor: array[0..255, 0..2] of Integer;  // Mapeamento RGB para cada nível de cinza
+  corFinal: TColor;
+begin
+  // Montando a tabela de mapeamento: De tons de cinza para cores
+  for i := 0 to 255 do
+  begin
+    if i < 64 then
+    begin
+      tabelaPseudoCor[i, 0] := 0;               // Vermelho
+      tabelaPseudoCor[i, 1] := 0;               // Verde
+      tabelaPseudoCor[i, 2] := i * 4;           // Azul (vai de 0 até 255)
+    end
+    else if i < 128 then
+    begin
+      tabelaPseudoCor[i, 0] := 0;
+      tabelaPseudoCor[i, 1] := (i - 64) * 4;    // Verde crescendo
+      tabelaPseudoCor[i, 2] := 255;             // Azul máximo
+    end
+    else if i < 192 then
+    begin
+      tabelaPseudoCor[i, 0] := 0;
+      tabelaPseudoCor[i, 1] := 255;             // Verde máximo
+      tabelaPseudoCor[i, 2] := 255 - (i - 128) * 4;  // Azul diminuindo
+    end
+    else
+    begin
+      tabelaPseudoCor[i, 0] := (i - 192) * 4;   // Vermelho crescendo
+      tabelaPseudoCor[i, 1] := 255;             // Verde máximo
+      tabelaPseudoCor[i, 2] := 0;               // Azul zero
+    end;
+  end;
+
+  // Aplicando a pseudo cor pixel a pixel
+  for i := 0 to Image1.Width - 1 do
+    for j := 0 to Image1.Height - 1 do
+    begin
+      // Pegando o valor de cinza (assumindo que a imagem é grayscale, pegando o canal R basta)
+      tomCinza := GetRValue(ColorToRGB(Image1.Canvas.Pixels[i, j]));
+
+      // Convertendo para cor RGB da tabela
+      corFinal := RGB(tabelaPseudoCor[tomCinza, 0],
+                      tabelaPseudoCor[tomCinza, 1],
+                      tabelaPseudoCor[tomCinza, 2]);
+
+      // Aplicando na imagem de saída
+      Image2.Canvas.Pixels[i, j] := corFinal;
+    end;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -1599,6 +1661,114 @@ procedure TForm1.MenuItem4Click(Sender: TObject);
 begin
    Close;
 end;
+
+procedure TForm1.MenuItem50Click(Sender: TObject);
+var
+  bmp, bmpLaplN4, bmpLoG: Graphics.TBitmap;
+  laplacianoN4: array of array of Integer;
+  filtroLoG: array[0..4, 0..4] of Integer;
+  i, j, x, y: Integer;
+  soma, corNormalizada, minVal, maxVal: Integer;
+begin
+  bmp := Graphics.TBitmap.Create;
+  bmpLaplN4 := Graphics.TBitmap.Create;
+  bmpLoG := Graphics.TBitmap.Create;
+  try
+    bmp.Assign(Image1.Picture.Bitmap);  // imagem original
+
+    // Prepara bitmaps resultado com o mesmo tamanho
+    bmpLaplN4.SetSize(bmp.Width, bmp.Height);
+    bmpLoG.SetSize(bmp.Width, bmp.Height);
+
+    // Redimensiona matriz laplacianoN4 para o tamanho da imagem
+    SetLength(laplacianoN4, bmp.Height, bmp.Width);
+
+    // Inicializa matriz laplacianoN4 com zeros
+    for i := 0 to bmp.Height - 1 do
+      for j := 0 to bmp.Width - 1 do
+        laplacianoN4[i, j] := 0;
+
+    minVal := MaxInt;
+    maxVal := -MaxInt;
+
+    // Calcula Laplaciano N4
+    for i := 1 to bmp.Height - 2 do
+      for j := 1 to bmp.Width - 2 do
+      begin
+        laplacianoN4[i, j] :=
+          4 * GetRValue(bmp.Canvas.Pixels[j, i]) -
+          (GetRValue(bmp.Canvas.Pixels[j - 1, i]) +
+           GetRValue(bmp.Canvas.Pixels[j + 1, i]) +
+           GetRValue(bmp.Canvas.Pixels[j, i - 1]) +
+           GetRValue(bmp.Canvas.Pixels[j, i + 1]));
+
+        if laplacianoN4[i, j] < minVal then minVal := laplacianoN4[i, j];
+        if laplacianoN4[i, j] > maxVal then maxVal := laplacianoN4[i, j];
+      end;
+
+    if minVal = maxVal then
+      maxVal := minVal + 1;
+
+    // Normaliza e escreve resultado do Laplaciano N4 em bmpLaplN4
+    for i := 1 to bmp.Height - 2 do
+      for j := 1 to bmp.Width - 2 do
+      begin
+        corNormalizada := Round(255 * (laplacianoN4[i, j] - minVal) / (maxVal - minVal));
+        corNormalizada := Max(0, Min(255, corNormalizada));
+        bmpLaplN4.Canvas.Pixels[j, i] := RGB(corNormalizada, corNormalizada, corNormalizada);
+      end;
+
+    // --- Define filtro LoG 5x5 ---
+    for i := 0 to 4 do
+      for j := 0 to 4 do
+        filtroLoG[i, j] := 0;
+
+    filtroLoG[0, 2] := -1;
+    filtroLoG[1, 1] := -1; filtroLoG[1, 2] := -2; filtroLoG[1, 3] := -1;
+    filtroLoG[2, 0] := -1; filtroLoG[2, 1] := -2; filtroLoG[2, 2] := 16; filtroLoG[2, 3] := -2; filtroLoG[2, 4] := -1;
+    filtroLoG[3, 1] := -1; filtroLoG[3, 2] := -2; filtroLoG[3, 3] := -1;
+    filtroLoG[4, 2] := -1;
+
+    // Aplica filtro LoG e escreve resultado em bmpLoG
+    for i := 2 to bmp.Height - 3 do
+      for j := 2 to bmp.Width - 3 do
+      begin
+        soma := 0;
+        for x := -2 to 2 do
+          for y := -2 to 2 do
+            soma := soma + GetRValue(bmp.Canvas.Pixels[j + y, i + x]) * filtroLoG[x + 2, y + 2];
+
+        if soma < 0 then soma := 0;
+        if soma > 255 then soma := 255;
+
+        bmpLoG.Canvas.Pixels[j, i] := RGB(soma, soma, soma);
+      end;
+
+    // Atualiza Image1 e Image2 com os resultados
+    Image1.Picture.Assign(bmpLaplN4);
+    Image2.Picture.Assign(bmpLoG);
+
+  finally
+    bmp.Free;
+    bmpLaplN4.Free;
+    bmpLoG.Free;
+  end;
+end;
+
+//Otsu Binarização
+procedure TForm1.MenuItem52Click(Sender: TObject);
+begin
+
+end;
+
+//Otsu Limiarização
+procedure TForm1.MenuItem53Click(Sender: TObject);
+begin
+
+end;
+
+
+
 //Novo formulário
 procedure TForm1.MenuItem6Click(Sender: TObject);
 begin
